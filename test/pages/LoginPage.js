@@ -24,11 +24,13 @@ class LoginPage {
   }
 
   async enterUsername(username) {
-    await this.usernameInput.setValue(username);
+    const input = await this.usernameInput;
+    await input.setValue(username);
   }
 
   async enterPassword(password) {
-    await this.passwordInput.setValue(password);
+    const input = await this.passwordInput;
+    await input.setValue(password);
   }
 
   async clearUsername() {
@@ -46,15 +48,18 @@ class LoginPage {
   }
 
   async clickLogin() {
-    await this.loginButton.click();
+    const button = await this.loginButton;
+    await button.click();
   }
 
   async getErrorMessage() {
-    return await this.errorMessage.getText();
+    const error = await this.errorMessage;
+    return await error.getText();
   }
 
   async getPageTitle() {
-    return await this.pageTitle.getText();
+    const title = await this.pageTitle;
+    return await title.getText();
   }
 
   async getBrowserTitle() {
@@ -62,7 +67,8 @@ class LoginPage {
   }
 
   async getSwagLabsHeader() {
-    return await $(".app_logo").getText();
+    const header = await $(".app_logo");
+    return await header.getText();
   }
 
   async login(username, password) {

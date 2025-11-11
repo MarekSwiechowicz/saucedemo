@@ -53,13 +53,24 @@ saucedemo/
 
 - Node.js (v12.14 or higher)
 - npm (Node Package Manager)
+- **Chrome Browser**: Version 87 (required for ChromeDriver 87.0.7 compatibility)
+  - **Note**: If you have a newer Chrome version, you have two options:
+    1. Install Chrome 87 alongside your current version
+    2. Run tests only in Firefox (remove Chrome from capabilities)
 
 ## Installation
 
-1. Install dependencies:
+1. **Important for Node 12.14**: Install dependencies with `--ignore-scripts` to skip incompatible postinstall scripts:
 ```bash
-npm install
+npm install --ignore-scripts
 ```
+
+2. Install geckodriver separately (if not already installed):
+```bash
+npm install geckodriver@3.0.1 --save-dev
+```
+
+**Note**: The `--ignore-scripts` flag is required because some packages have postinstall scripts that require Node 14+, but the packages themselves work fine with Node 12.14.
 
 ## Running Tests
 
@@ -73,14 +84,18 @@ npm test
 npm run test:chrome
 ```
 
-### Run tests in Firefox only:
+### Run tests in Firefox only (recommended for Node 12.14 if Chrome version mismatch):
 ```bash
 npm run test:firefox
 ```
 
+**Note**: If you have Chrome version 142 (or newer), Chrome tests will fail because ChromeDriver 87 only supports Chrome 87. Use the Firefox-only configuration instead.
+
 ## Test Configuration
 
-- **Test Automation Tool**: WebDriverIO v7.32.0 (compatible with Node.js 12.14+)
+- **Test Automation Tool**: WebDriverIO v6.12.1 (compatible with Node.js 12.14+)
+- **ChromeDriver**: v87.0.7 (requires Chrome browser version 87)
+- **GeckoDriver**: v3.0.1 (works with any Firefox version)
 - **Browsers**: Chrome and Firefox (headless mode)
 - **Locators**: CSS selectors
 - **Pattern**: Page Object Model

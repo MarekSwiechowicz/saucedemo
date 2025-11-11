@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "wdio run wdio.conf.js",
-    "test:chrome": "wdio run wdio.conf.js --spec",
-    "test:firefox": "wdio run wdio.conf.js --spec"
+    "test:firefox": "wdio run wdio.firefox-only.conf.js"
   },
   "keywords": [
     "webdriverio",
@@ -16,15 +15,17 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@wdio/cli": "^7.32.0",
-    "@wdio/local-runner": "^7.32.0",
-    "@wdio/mocha-framework": "^7.32.0",
-    "@wdio/spec-reporter": "^7.32.0",
-    "chromedriver": "^120.0.0",
-    "wdio-chromedriver-service": "^8.1.1",
-    "wdio-geckodriver-service": "^5.0.2"
+    "@wdio/cli": "^6.12.1",
+    "@wdio/local-runner": "^6.12.1",
+    "@wdio/mocha-framework": "^6.11.0",
+    "@wdio/spec-reporter": "^6.11.0",
+    "chromedriver": "^87.0.7",
+    "geckodriver": "^3.0.1",
+    "wdio-chromedriver-service": "^6.0.4",
+    "wdio-geckodriver-service": "^2.0.3"
   },
   "dependencies": {
-    "webdriverio": "^7.32.0"
+    "webdriverio": "^6.12.1",
+    "fs-extra": "^9.1.0"
   }
 }

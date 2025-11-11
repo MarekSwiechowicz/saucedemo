@@ -1,3 +1,7 @@
+// Firefox-only configuration for Node 12.14
+// Use this config if Chrome version doesn't match ChromeDriver 87
+// Run with: wdio run wdio.firefox-only.conf.js
+
 exports.config = {
   runner: "local",
 
@@ -5,24 +9,9 @@ exports.config = {
 
   exclude: [],
 
-  maxInstances: 2,
+  maxInstances: 1,
 
   capabilities: [
-    {
-      maxInstances: 1,
-      browserName: "chrome",
-      protocol: "webdriver",
-      "goog:chromeOptions": {
-        args: [
-          "--headless",
-          "--disable-gpu",
-          "--window-size=1920,1080",
-          "--no-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-software-rasterizer",
-        ],
-      },
-    },
     {
       maxInstances: 1,
       browserName: "firefox",
@@ -45,7 +34,7 @@ exports.config = {
 
   connectionRetryCount: 3,
 
-  services: ["chromedriver", "geckodriver"],
+  services: ["geckodriver"],
 
   framework: "mocha",
 
@@ -53,7 +42,7 @@ exports.config = {
 
   mochaOpts: {
     ui: "bdd",
-    timeout: 90000, // Increased timeout for stability
+    timeout: 90000,
   },
 
   before: function (capabilities, specs) {
@@ -64,3 +53,4 @@ exports.config = {
     console.log("Test execution completed.");
   },
 };
+
