@@ -69,6 +69,32 @@ class LoginPage {
     await this.enterUsername(username);
     await this.enterPassword(password);
     await this.clickLogin();
+
+    // Wait for navigation after login (especially important for performance_glitch_user)
+    if (username === "performance_glitch_user") {
+      await browser.waitUntil(
+        async () => {
+          const url = await browser.getUrl();
+          return url.includes("/inventory.html") || url.includes("/inventory");
+        },
+        {
+          timeout: 20000,
+          timeoutMsg: "Login did not complete within 20 seconds",
+        }
+      );
+    } else {
+      // Wait for page to load for other users
+      await browser.waitUntil(
+        async () => {
+          const url = await browser.getUrl();
+          return url.includes("/inventory.html") || url.includes("/inventory");
+        },
+        {
+          timeout: 10000,
+          timeoutMsg: "Login did not complete within 10 seconds",
+        }
+      );
+    }
   }
 }
 

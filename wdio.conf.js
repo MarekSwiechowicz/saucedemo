@@ -12,7 +12,14 @@ exports.config = {
       maxInstances: 1,
       browserName: "chrome",
       "goog:chromeOptions": {
-        args: ["--headless", "--disable-gpu", "--window-size=1920,1080"],
+        args: [
+          "--headless",
+          "--disable-gpu",
+          "--window-size=1920,1080",
+          "--no-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-software-rasterizer",
+        ],
       },
     },
     {
@@ -44,7 +51,7 @@ exports.config = {
 
   mochaOpts: {
     ui: "bdd",
-    timeout: 60000,
+    timeout: 90000, // Increased timeout for stability
   },
 
   before: function (capabilities, specs) {

@@ -51,7 +51,7 @@ saucedemo/
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v12.14 or higher)
 - npm (Node Package Manager)
 
 ## Installation
@@ -80,7 +80,7 @@ npm run test:firefox
 
 ## Test Configuration
 
-- **Test Automation Tool**: WebDriverIO v8.24.0
+- **Test Automation Tool**: WebDriverIO v7.32.0 (compatible with Node.js 12.14+)
 - **Browsers**: Chrome and Firefox (headless mode)
 - **Locators**: CSS selectors
 - **Pattern**: Page Object Model
