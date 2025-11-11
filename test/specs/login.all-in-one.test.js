@@ -59,11 +59,19 @@
 //
 // RUNNING TESTS
 // ============================================================================
-// Run all tests (Chrome and Firefox in parallel):
+// This all-in-one file can be run in multiple ways:
+//
+// Option 1: Using npm test (wdio.conf.js is configured to run this file):
 //   npm test
 //
-// Run this specific file:
+// Option 2: Using the dedicated script:
+//   npm run test:all-in-one
+//
+// Option 3: Direct command:
 //   npm test -- --spec test/specs/login.all-in-one.test.js
+//
+// Note: wdio.conf.js and package.json are still required for WebDriverIO
+//       framework setup, but all test code is in this single file.
 //
 // TEST CONFIGURATION
 // ============================================================================

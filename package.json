@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "wdio run wdio.conf.js",
+    "test:all-in-one": "wdio run wdio.conf.js --spec test/specs/login.all-in-one.test.js",
     "test:firefox": "wdio run wdio.firefox-only.conf.js"
   },
   "keywords": [
