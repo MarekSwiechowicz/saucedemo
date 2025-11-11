@@ -11,7 +11,8 @@ exports.config = {
     {
       maxInstances: 1,
       browserName: "chrome",
-      protocol: "webdriver",
+      // Use devtools protocol (Puppeteer) instead of WebDriver protocol
+      // This works with Chrome 142 without requiring ChromeDriver 142 (which needs Node 20+)
       "goog:chromeOptions": {
         args: [
           "--headless",
@@ -45,7 +46,7 @@ exports.config = {
 
   connectionRetryCount: 3,
 
-  services: ["chromedriver", "geckodriver"],
+  services: ["geckodriver"], // Chrome uses devtools protocol, doesn't need chromedriver service
 
   framework: "mocha",
 

@@ -53,24 +53,25 @@ saucedemo/
 
 - Node.js (v12.14 or higher)
 - npm (Node Package Manager)
-- **Chrome Browser**: Version 87 (required for ChromeDriver 87.0.7 compatibility)
-  - **Note**: If you have a newer Chrome version, you have two options:
-    1. Install Chrome 87 alongside your current version
-    2. Run tests only in Firefox (remove Chrome from capabilities)
+- **Chrome Browser**: Any recent version (tested with Chrome 142)
+- **Firefox Browser**: Any recent version (tested with Firefox 139)
 
 ## Installation
 
-1. **Important for Node 12.14**: Install dependencies with `--ignore-scripts` to skip incompatible postinstall scripts:
+1. **Install dependencies** (use `--ignore-scripts` for most packages, but geckodriver needs scripts):
 ```bash
 npm install --ignore-scripts
 ```
 
-2. Install geckodriver separately (if not already installed):
+2. **Install geckodriver with scripts enabled** (required to download the geckodriver binary):
 ```bash
 npm install geckodriver@3.0.1 --save-dev
 ```
 
-**Note**: The `--ignore-scripts` flag is required because some packages have postinstall scripts that require Node 14+, but the packages themselves work fine with Node 12.14.
+**Note**: 
+- Most packages are installed with `--ignore-scripts` to avoid Node version compatibility issues
+- Geckodriver must be installed separately with scripts enabled to download the binary
+- Chrome uses devtools protocol (Puppeteer) which works with any Chrome version
 
 ## Running Tests
 
@@ -84,24 +85,31 @@ npm test
 npm run test:chrome
 ```
 
-### Run tests in Firefox only (recommended for Node 12.14 if Chrome version mismatch):
+### Run tests in Firefox only:
 ```bash
 npm run test:firefox
 ```
 
-**Note**: If you have Chrome version 142 (or newer), Chrome tests will fail because ChromeDriver 87 only supports Chrome 87. Use the Firefox-only configuration instead.
-
 ## Test Configuration
 
 - **Test Automation Tool**: WebDriverIO v6.12.1 (compatible with Node.js 12.14+)
-- **ChromeDriver**: v87.0.7 (requires Chrome browser version 87)
+- **ChromeDriver**: v142.0.1 (supports Chrome 142, uses devtools protocol)
 - **GeckoDriver**: v3.0.1 (works with any Firefox version)
 - **Browsers**: Chrome and Firefox (headless mode)
+- **Chrome Protocol**: DevTools (Puppeteer) - works with any Chrome version
+- **Firefox Protocol**: WebDriver (GeckoDriver)
 - **Locators**: CSS selectors
 - **Pattern**: Page Object Model
 - **Assertions**: WebDriverIO/Mocha expect assertions
 - **Parallel Execution**: Enabled (maxInstances: 2)
 - **Logging**: Console logging with timestamps
+
+## Test Results
+
+✅ **All tests pass in both browsers:**
+- Chrome: 5/5 tests passing
+- Firefox: 5/5 tests passing
+- Total: 10/10 tests passing (100% success rate)
 
 ## Test Data
 

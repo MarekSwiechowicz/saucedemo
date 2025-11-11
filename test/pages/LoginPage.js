@@ -35,16 +35,52 @@ class LoginPage {
 
   async clearUsername() {
     const input = await this.usernameInput;
-    await input.doubleClick();
-    await browser.keys("Delete");
-    await input.setValue("");
+    await input.click();
+    // Select all and delete
+    await browser.keys(['Control', 'a']);
+    await browser.keys('Delete');
+    // Also use clearValue
+    await input.clearValue();
+    // Force clear using JavaScript
+    await browser.execute(() => {
+      const element = document.querySelector(`#user-name`);
+      if (element) {
+        element.focus();
+        element.select();
+        element.value = '';
+        // Trigger events
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event('change', { bubbles: true }));
+        element.dispatchEvent(new Event('blur', { bubbles: true }));
+      }
+    });
+    // Small wait to ensure clearing is complete
+    await browser.pause(100);
   }
 
   async clearPassword() {
     const input = await this.passwordInput;
-    await input.doubleClick();
-    await browser.keys("Delete");
-    await input.setValue("");
+    await input.click();
+    // Select all and delete
+    await browser.keys(['Control', 'a']);
+    await browser.keys('Delete');
+    // Also use clearValue
+    await input.clearValue();
+    // Force clear using JavaScript
+    await browser.execute(() => {
+      const element = document.querySelector(`#password`);
+      if (element) {
+        element.focus();
+        element.select();
+        element.value = '';
+        // Trigger events
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event('change', { bubbles: true }));
+        element.dispatchEvent(new Event('blur', { bubbles: true }));
+      }
+    });
+    // Small wait to ensure clearing is complete
+    await browser.pause(100);
   }
 
   async clickLogin() {
