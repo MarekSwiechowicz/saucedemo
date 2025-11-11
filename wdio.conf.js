@@ -1,7 +1,7 @@
 exports.config = {
   runner: "local",
 
-  specs: ["./test/specs/login.all-in-one.test.js"], // Run only the all-in-one file
+  specs: ["./test/specs/**/*.js"], // Run all test files
 
   exclude: [],
 
