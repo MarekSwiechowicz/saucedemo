@@ -29,9 +29,15 @@ This project contains automated tests for the SauceDemo website using WebDriverI
 
 ```
 test/
+├── features/                  # BDD Feature files (Cucumber/Gherkin)
+│   ├── UC1_EmptyCredentials.feature
+│   ├── UC2_UsernameOnly.feature
+│   ├── UC3_ValidCredentials.feature
+│   └── step-definitions/
+│       └── login.steps.js     # Step definitions for BDD tests
 ├── pages/
 │   └── LoginPage.js          # Page Object Model for login page
-├── specs/
+├── specs/                     # Mocha test files (original implementation)
 │   ├── UC1_EmptyCredentials.test.js
 │   ├── UC2_UsernameOnly.test.js
 │   └── UC3_ValidCredentials.test.js
@@ -75,8 +81,21 @@ npx wdio run wdio.conf.js --spec test/specs/UC1_EmptyCredentials.test.js
 - ✅ Parallel execution (maxInstances: 2)
 - ✅ Data Provider for parameterized tests
 - ✅ Winston logger for data logging
-- ✅ Mocha framework with BDD structure (Given-When-Then)
+- ✅ **BDD with Cucumber/Gherkin** (Feature files + Step definitions)
+- ✅ Mocha framework with BDD structure (Given-When-Then) - Alternative implementation
 - ✅ Comprehensive assertions with error handling
+
+## BDD Implementation
+
+The project includes a BDD implementation using Cucumber and Gherkin syntax:
+
+- **Feature Files**: Written in Gherkin syntax describing test scenarios in plain English
+- **Step Definitions**: Map Gherkin steps to executable test code
+- **Reusable Steps**: Step definitions can be shared across multiple scenarios
+
+See [BDD_IMPLEMENTATION.md](./BDD_IMPLEMENTATION.md) for detailed information about the BDD setup.
+
+**Note**: There is currently a known ESM compatibility issue with `@wdio/cucumber-framework`. The Mocha-based tests remain available as an alternative. See BDD_IMPLEMENTATION.md for details.
 
 ## Configuration
 

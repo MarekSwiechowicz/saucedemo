@@ -1,20 +1,23 @@
+// Mocha configuration file (backup/alternative)
+// This is the original Mocha-based configuration
+// Use this if Cucumber BDD has compatibility issues
+
 exports.config = {
     runner: 'local',
     
-    // Test specs - BDD with Cucumber
+    // Test specs - Mocha tests
     specs: [
-        './test/features/**/*.feature'
+        './test/specs/**/*.js'
     ],
     
     // Capabilities for parallel execution
-    maxInstances: 2, // Run 2 instances in parallel (one per browser)
-    maxInstancesPerCapability: 1, // Limit to 1 instance per capability to reduce resource contention
+    maxInstances: 2,
+    maxInstancesPerCapability: 1,
     capabilities: [
         {
             browserName: 'chrome',
             'goog:chromeOptions': {
                 args: [
-                    // Removed --headless to run in visible mode for better stability
                     '--window-size=1920,1080',
                     '--no-sandbox',
                     '--disable-dev-shm-usage',
@@ -36,24 +39,13 @@ exports.config = {
         }
     ],
     
-    // Test framework - Cucumber for BDD
-    framework: 'cucumber',
+    // Test framework - Mocha
+    framework: 'mocha',
     
-    // Cucumber options
-    cucumberOpts: {
-        require: ['./test/features/step-definitions/**/*.js'],
-        backtrace: false,
-        requireModule: [],
-        dryRun: false,
-        failFast: false,
-        // Removed format option to avoid ESM formatter loading issue
-        // The framework will use its default formatter
-        snippets: true,
-        source: true,
-        strict: false,
-        tagExpression: '',
-        timeout: 90000,  // Increased timeout for performance_glitch_user
-        ignoreUndefinedDefinitions: false
+    // Mocha options
+    mochaOpts: {
+        ui: 'bdd',
+        timeout: 90000
     },
     
     // Services
@@ -75,7 +67,6 @@ exports.config = {
     
     // Hooks
     before: function (capabilities, specs) {
-        // Set implicit wait
         browser.setTimeout({ 
             implicit: 10000,
             pageLoad: 30000,
@@ -83,10 +74,7 @@ exports.config = {
         });
     },
     
-    // Removed beforeTest navigation - tests handle their own navigation
-    
     afterTest: function (test, context, { error, result, duration, passed, retries }) {
-        // Take screenshot on failure
         if (!passed) {
             browser.takeScreenshot();
         }
