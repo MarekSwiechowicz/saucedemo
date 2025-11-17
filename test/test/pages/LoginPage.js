@@ -2,7 +2,14 @@
  * Login Page Object Model
  * Contains all selectors and methods for the SauceDemo login page
  */
+const logger = require("../utils/Logger");
+
 class LoginPage {
+  // Page URL
+  get url() {
+    return "https://www.saucedemo.com/";
+  }
+
   // CSS Selectors
   get usernameInput() {
     return $("#user-name");
@@ -28,24 +35,36 @@ class LoginPage {
     return $(".app_logo");
   }
 
-  get pageTitleText() {
-    return $(".app_logo");
-  }
-
   /**
    * Navigate to the login page
+   * Only navigates if not already on the login page to avoid unnecessary page loads
    */
   async open() {
     try {
-      await browser.url("https://www.saucedemo.com/");
+      // Check if we're already on the login page
+      const currentUrl = await browser.getUrl();
+      const isOnLoginPage =
+        currentUrl.includes("saucedemo.com") &&
+        (currentUrl.endsWith("/") || currentUrl.includes("/index.html"));
+
+      if (isOnLoginPage) {
+        // Already on login page, skip navigation to save time
+        logger.info("Already on login page, skipping navigation");
+        return;
+      }
+
+      // Navigate to login page
+      logger.info("Navigating to login page");
+      await browser.url(this.url);
     } catch (e) {
       // If session is lost, try to reload and retry
       if (
         e.message &&
         (e.message.includes("session") || e.message.includes("invalid"))
       ) {
+        logger.info("Session lost during navigation, reloading session...");
         await browser.reloadSession();
-        await browser.url("https://www.saucedemo.com/");
+        await browser.url(this.url);
       } else {
         throw e;
       }
@@ -66,10 +85,12 @@ class LoginPage {
         e.message &&
         (e.message.includes("session") || e.message.includes("invalid"))
       ) {
+        logger.info("Session lost during username entry, retrying...");
         await browser.pause(2000);
         await this.usernameInput.waitForDisplayed({ timeout: 5000 });
         await this.usernameInput.setValue(username);
       } else {
+        logger.error(`Failed to enter username: ${e.message}`);
         throw e;
       }
     }
@@ -80,44 +101,77 @@ class LoginPage {
    * @param {string} password - Password to enter
    */
   async enterPassword(password) {
-    await this.passwordInput.waitForDisplayed({ timeout: 5000 });
-    await this.passwordInput.setValue(password);
+    try {
+      await this.passwordInput.waitForDisplayed({ timeout: 5000 });
+      await this.passwordInput.setValue(password);
+    } catch (e) {
+      // Handle session disconnection - retry once
+      if (
+        e.message &&
+        (e.message.includes("session") || e.message.includes("invalid"))
+      ) {
+        logger.info("Session lost during password entry, retrying...");
+        await browser.pause(2000);
+        await this.passwordInput.waitForDisplayed({ timeout: 5000 });
+        await this.passwordInput.setValue(password);
+      } else {
+        throw e;
+      }
+    }
   }
 
   /**
    * Clear username field
+   * Uses multiple methods to ensure field is cleared (Chrome compatibility)
    */
   async clearUsername() {
-    await this.usernameInput.waitForDisplayed({ timeout: 5000 });
-    // Click to focus, select all, and delete for Chrome compatibility
-    await this.usernameInput.click();
-    await browser.keys(["Control", "a"]);
-    await browser.keys("Delete");
-    // Also use JavaScript to ensure it's truly empty
-    await browser.execute("arguments[0].value = '';", await this.usernameInput);
-    // Trigger input event to ensure browser recognizes the change
-    await browser.execute(
-      "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
-      await this.usernameInput
-    );
+    try {
+      await this.usernameInput.waitForDisplayed({ timeout: 5000 });
+      // Click to focus, select all, and delete for Chrome compatibility
+      await this.usernameInput.click();
+      await browser.keys(["Control", "a"]);
+      await browser.keys("Delete");
+      // Also use JavaScript to ensure it's truly empty
+      await browser.execute(
+        "arguments[0].value = '';",
+        await this.usernameInput
+      );
+      // Trigger input event to ensure browser recognizes the change
+      await browser.execute(
+        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
+        await this.usernameInput
+      );
+    } catch (e) {
+      logger.error(`Failed to clear username field: ${e.message}`);
+      throw e;
+    }
   }
 
   /**
    * Clear password field
+   * Uses multiple methods to ensure field is cleared (Chrome compatibility)
    */
   async clearPassword() {
-    await this.passwordInput.waitForDisplayed({ timeout: 5000 });
-    // Click to focus, select all, and delete for Chrome compatibility
-    await this.passwordInput.click();
-    await browser.keys(["Control", "a"]);
-    await browser.keys("Delete");
-    // Also use JavaScript to ensure it's truly empty
-    await browser.execute("arguments[0].value = '';", await this.passwordInput);
-    // Trigger input event to ensure browser recognizes the change
-    await browser.execute(
-      "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
-      await this.passwordInput
-    );
+    try {
+      await this.passwordInput.waitForDisplayed({ timeout: 5000 });
+      // Click to focus, select all, and delete for Chrome compatibility
+      await this.passwordInput.click();
+      await browser.keys(["Control", "a"]);
+      await browser.keys("Delete");
+      // Also use JavaScript to ensure it's truly empty
+      await browser.execute(
+        "arguments[0].value = '';",
+        await this.passwordInput
+      );
+      // Trigger input event to ensure browser recognizes the change
+      await browser.execute(
+        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
+        await this.passwordInput
+      );
+    } catch (e) {
+      logger.error(`Failed to clear password field: ${e.message}`);
+      throw e;
+    }
   }
 
   /**
@@ -129,12 +183,14 @@ class LoginPage {
       await this.loginButton.waitForDisplayed({ timeout: 5000 });
       if (useJavaScriptClick) {
         // Use JavaScript click for better reliability with performance_glitch_user
+        logger.info("Using JavaScript click for login button");
         await browser.execute("arguments[0].click();", await this.loginButton);
       } else {
         await this.loginButton.click();
       }
     } catch (e) {
       // Retry once if click fails
+      logger.info("Login button click failed, retrying...");
       try {
         await this.loginButton.waitForDisplayed({ timeout: 5000 });
         if (useJavaScriptClick) {
@@ -146,6 +202,7 @@ class LoginPage {
           await this.loginButton.click();
         }
       } catch (retryError) {
+        logger.error(`Failed to click login button: ${retryError.message}`);
         throw retryError;
       }
     }
@@ -156,21 +213,27 @@ class LoginPage {
    * @returns {Promise<string>} Error message text
    */
   async getErrorMessage() {
-    await this.errorMessage.waitForDisplayed({ timeout: 5000 });
-    // Try to get text from h3 first, if not available, get from container
     try {
-      const h3Text = await this.errorMessageText.getText();
-      if (h3Text && typeof h3Text === "string" && h3Text.length > 0) {
-        return h3Text;
+      await this.errorMessage.waitForDisplayed({ timeout: 5000 });
+      // Try to get text from h3 first, if not available, get from container
+      try {
+        const h3Text = await this.errorMessageText.getText();
+        if (h3Text && typeof h3Text === "string" && h3Text.length > 0) {
+          return h3Text;
+        }
+      } catch (e) {
+        // Fallback to container text
+        logger.info("Could not get error text from h3, using container");
       }
+      const containerText = await this.errorMessage.getText();
+      // Ensure we return a string
+      return typeof containerText === "string"
+        ? containerText
+        : String(containerText || "");
     } catch (e) {
-      // Fallback to container text
+      logger.error(`Failed to get error message: ${e.message}`);
+      throw e;
     }
-    const containerText = await this.errorMessage.getText();
-    // Ensure we return a string
-    return typeof containerText === "string"
-      ? containerText
-      : String(containerText || "");
   }
 
   /**
