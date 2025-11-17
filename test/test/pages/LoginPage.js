@@ -1,8 +1,12 @@
 /**
- * Login Page Object Model
- * Contains all selectors and methods for the SauceDemo login page
+ * Login Page (Physical Page)
+ * Uses Page Components and Elements to interact with the SauceDemo login page
  */
 const logger = require("../utils/Logger");
+const FormField = require("./components/FormField");
+const Button = require("./components/Button");
+const ErrorMessage = require("./components/ErrorMessage");
+const BaseElement = require("./elements/BaseElement");
 
 class LoginPage {
   // Page URL
@@ -10,29 +14,24 @@ class LoginPage {
     return "https://www.saucedemo.com/";
   }
 
-  // CSS Selectors
-  get usernameInput() {
-    return $("#user-name");
-  }
+  // Page Components
+  constructor() {
+    // Form Fields
+    this.usernameField = new FormField("#user-name", "Username");
+    this.passwordField = new FormField("#password", "Password");
 
-  get passwordInput() {
-    return $("#password");
-  }
+    // Buttons
+    this.loginButton = new Button("#login-button", "Login Button");
 
-  get loginButton() {
-    return $("#login-button");
-  }
+    // Error Message Component
+    this.errorMessage = new ErrorMessage(
+      ".error-message-container",
+      ".error-message-container h3",
+      "Error Message"
+    );
 
-  get errorMessage() {
-    return $(".error-message-container");
-  }
-
-  get errorMessageText() {
-    return $(".error-message-container h3");
-  }
-
-  get pageTitle() {
-    return $(".app_logo");
+    // Page Elements
+    this.pageTitle = new BaseElement(".app_logo", "Page Title");
   }
 
   /**
@@ -76,24 +75,7 @@ class LoginPage {
    * @param {string} username - Username to enter
    */
   async enterUsername(username) {
-    try {
-      await this.usernameInput.waitForDisplayed({ timeout: 5000 });
-      await this.usernameInput.setValue(username);
-    } catch (e) {
-      // Handle session disconnection - retry once
-      if (
-        e.message &&
-        (e.message.includes("session") || e.message.includes("invalid"))
-      ) {
-        logger.info("Session lost during username entry, retrying...");
-        await browser.pause(2000);
-        await this.usernameInput.waitForDisplayed({ timeout: 5000 });
-        await this.usernameInput.setValue(username);
-      } else {
-        logger.error(`Failed to enter username: ${e.message}`);
-        throw e;
-      }
-    }
+    await this.usernameField.enterValue(username);
   }
 
   /**
@@ -101,77 +83,21 @@ class LoginPage {
    * @param {string} password - Password to enter
    */
   async enterPassword(password) {
-    try {
-      await this.passwordInput.waitForDisplayed({ timeout: 5000 });
-      await this.passwordInput.setValue(password);
-    } catch (e) {
-      // Handle session disconnection - retry once
-      if (
-        e.message &&
-        (e.message.includes("session") || e.message.includes("invalid"))
-      ) {
-        logger.info("Session lost during password entry, retrying...");
-        await browser.pause(2000);
-        await this.passwordInput.waitForDisplayed({ timeout: 5000 });
-        await this.passwordInput.setValue(password);
-      } else {
-        throw e;
-      }
-    }
+    await this.passwordField.enterValue(password);
   }
 
   /**
    * Clear username field
-   * Uses multiple methods to ensure field is cleared (Chrome compatibility)
    */
   async clearUsername() {
-    try {
-      await this.usernameInput.waitForDisplayed({ timeout: 5000 });
-      // Click to focus, select all, and delete for Chrome compatibility
-      await this.usernameInput.click();
-      await browser.keys(["Control", "a"]);
-      await browser.keys("Delete");
-      // Also use JavaScript to ensure it's truly empty
-      await browser.execute(
-        "arguments[0].value = '';",
-        await this.usernameInput
-      );
-      // Trigger input event to ensure browser recognizes the change
-      await browser.execute(
-        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
-        await this.usernameInput
-      );
-    } catch (e) {
-      logger.error(`Failed to clear username field: ${e.message}`);
-      throw e;
-    }
+    await this.usernameField.clearField();
   }
 
   /**
    * Clear password field
-   * Uses multiple methods to ensure field is cleared (Chrome compatibility)
    */
   async clearPassword() {
-    try {
-      await this.passwordInput.waitForDisplayed({ timeout: 5000 });
-      // Click to focus, select all, and delete for Chrome compatibility
-      await this.passwordInput.click();
-      await browser.keys(["Control", "a"]);
-      await browser.keys("Delete");
-      // Also use JavaScript to ensure it's truly empty
-      await browser.execute(
-        "arguments[0].value = '';",
-        await this.passwordInput
-      );
-      // Trigger input event to ensure browser recognizes the change
-      await browser.execute(
-        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
-        await this.passwordInput
-      );
-    } catch (e) {
-      logger.error(`Failed to clear password field: ${e.message}`);
-      throw e;
-    }
+    await this.passwordField.clearField();
   }
 
   /**
@@ -179,33 +105,7 @@ class LoginPage {
    * @param {boolean} useJavaScriptClick - Use JavaScript click instead of regular click (for performance_glitch_user)
    */
   async clickLogin(useJavaScriptClick = false) {
-    try {
-      await this.loginButton.waitForDisplayed({ timeout: 5000 });
-      if (useJavaScriptClick) {
-        // Use JavaScript click for better reliability with performance_glitch_user
-        logger.info("Using JavaScript click for login button");
-        await browser.execute("arguments[0].click();", await this.loginButton);
-      } else {
-        await this.loginButton.click();
-      }
-    } catch (e) {
-      // Retry once if click fails
-      logger.info("Login button click failed, retrying...");
-      try {
-        await this.loginButton.waitForDisplayed({ timeout: 5000 });
-        if (useJavaScriptClick) {
-          await browser.execute(
-            "arguments[0].click();",
-            await this.loginButton
-          );
-        } else {
-          await this.loginButton.click();
-        }
-      } catch (retryError) {
-        logger.error(`Failed to click login button: ${retryError.message}`);
-        throw retryError;
-      }
-    }
+    await this.loginButton.click(useJavaScriptClick);
   }
 
   /**
@@ -213,27 +113,7 @@ class LoginPage {
    * @returns {Promise<string>} Error message text
    */
   async getErrorMessage() {
-    try {
-      await this.errorMessage.waitForDisplayed({ timeout: 5000 });
-      // Try to get text from h3 first, if not available, get from container
-      try {
-        const h3Text = await this.errorMessageText.getText();
-        if (h3Text && typeof h3Text === "string" && h3Text.length > 0) {
-          return h3Text;
-        }
-      } catch (e) {
-        // Fallback to container text
-        logger.info("Could not get error text from h3, using container");
-      }
-      const containerText = await this.errorMessage.getText();
-      // Ensure we return a string
-      return typeof containerText === "string"
-        ? containerText
-        : String(containerText || "");
-    } catch (e) {
-      logger.error(`Failed to get error message: ${e.message}`);
-      throw e;
-    }
+    return await this.errorMessage.getText();
   }
 
   /**
@@ -241,17 +121,7 @@ class LoginPage {
    * @returns {Promise<boolean>} True if error message is displayed
    */
   async isErrorMessageDisplayed() {
-    try {
-      // Wait for element to be displayed with a short timeout
-      await this.errorMessage.waitForDisplayed({
-        timeout: 2000,
-        reverse: false,
-      });
-      return true;
-    } catch (e) {
-      // If element is not displayed or doesn't exist, return false
-      return false;
-    }
+    return await this.errorMessage.isDisplayed();
   }
 
   /**
@@ -327,7 +197,6 @@ class LoginPage {
    * @returns {Promise<string>} Page title text
    */
   async getPageTitle() {
-    // Use browser title
     return await browser.getTitle();
   }
 }
