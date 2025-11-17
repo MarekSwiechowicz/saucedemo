@@ -1,25 +1,33 @@
 /**
- * UC-3: Test login form with valid Username and Password
+ * UC-3: Login Form - Valid Credentials (BDD)
  * 
- * Steps:
- * 1. Enter a username from the Accepted usernames list
- * 2. Enter a valid password (use as a secret value)
- * 3. Click the Login button
- * 4. Verify successful login by checking that the title "Swag Labs" appears on the dashboard
+ * Feature: Login Form - Successful Login
+ * As a user
+ * I want to login successfully with valid credentials
+ * So that I can access the application
+ * 
+ * Scenario Outline: Successful login with valid credentials
+ * Given: User is on the SauceDemo login page
+ * When: User enters valid username and password and clicks login
+ * Then: User is successfully logged in
+ * And: User should see the page title "Swag Labs"
+ * And: User should be on the inventory page
  */
 const LoginPage = require('../pages/LoginPage');
 const DataProvider = require('../utils/DataProvider');
 const logger = require('../utils/Logger');
 
-describe('UC-3: Login Form - Valid Credentials', () => {
+describe('Feature: Login Form - Valid Credentials', () => {
     
     const testDataArray = DataProvider.getLoginTestData();
     
     testDataArray.forEach((testData) => {
-        describe(`Test: ${testData.testName}`, () => {
+        describe(`Scenario: ${testData.testName}`, () => {
             
+            // GIVEN: User is on the SauceDemo login page
             beforeEach(async () => {
-                logger.info(`Starting UC-3 test: ${testData.testName}`);
+                logger.info(`GIVEN: User is on the SauceDemo login page (${testData.testName})`);
+                
                 // For performance_glitch_user, set longer timeouts and wait before opening
                 if (testData.username === 'performance_glitch_user') {
                     await browser.setTimeout({ 
@@ -58,8 +66,8 @@ describe('UC-3: Login Form - Valid Credentials', () => {
             it('should successfully login and display "Swag Labs" title', async () => {
                 DataProvider.logTestData('UC-3', testData);
                 
-                // Step 1: Enter a username from the Accepted usernames list
-                logger.info(`Step 1: Entering username: ${testData.username}`);
+                // GIVEN: User has entered username in the username field
+                logger.info(`GIVEN: User has entered "${testData.username}" in the username field`);
                 let usernameEntered = false;
                 let attempts = 0;
                 const maxAttempts = testData.username === 'performance_glitch_user' ? 3 : 1;
@@ -99,8 +107,8 @@ describe('UC-3: Login Form - Valid Credentials', () => {
                     }
                 }
                 
-                // Step 2: Enter a valid password (use as a secret value)
-                logger.info('Step 2: Entering valid password');
+                // GIVEN: User has entered a valid password in the password field
+                logger.info('GIVEN: User has entered a valid password in the password field');
                 await LoginPage.enterPassword(testData.password);
                 
                 // For performance_glitch_user, add a pause before clicking to prevent browser timeout
@@ -109,8 +117,8 @@ describe('UC-3: Login Form - Valid Credentials', () => {
                     await browser.pause(1000);
                 }
                 
-                // Step 3: Click the Login button
-                logger.info('Step 3: Clicking Login button');
+                // WHEN: User clicks the Login button
+                logger.info('WHEN: User clicks the Login button');
                 const useJsClick = testData.username === 'performance_glitch_user';
                 
                 try {
@@ -126,8 +134,8 @@ describe('UC-3: Login Form - Valid Credentials', () => {
                     }
                 }
                 
-                // Step 4: Verify successful login by checking that the title "Swag Labs" appears on the dashboard
-                logger.info('Step 4: Verifying successful login');
+                // THEN: User should be successfully logged in
+                logger.info('THEN: Verifying successful login');
                 
                 // Wait for successful login and verify (longer timeout for performance_glitch_user)
                 const timeout = testData.username === 'performance_glitch_user' ? 30000 : 10000;
@@ -154,13 +162,16 @@ describe('UC-3: Login Form - Valid Credentials', () => {
                 
                 expect(await LoginPage.isLoginSuccessful()).toBe(true);
                 
+                // AND: User should see the page title "Swag Labs"
+                logger.info('AND: Verifying page title "Swag Labs" is displayed');
                 const pageTitle = await LoginPage.getPageTitle();
                 logger.info(`Page title displayed: ${pageTitle}`);
                 
                 // Assert page title matches exactly
                 expect(pageTitle).toBe('Swag Labs');
                 
-                // Additional verification: Check that we're on the inventory page
+                // AND: User should be on the inventory page
+                logger.info('AND: Verifying user is on the inventory page');
                 const currentUrl = await browser.getUrl();
                 expect(currentUrl).toContain('/inventory.html');
                 logger.info(`Successfully navigated to: ${currentUrl}`);

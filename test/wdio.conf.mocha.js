@@ -1,6 +1,5 @@
 // Mocha configuration file (backup/alternative)
-// This is the original Mocha-based configuration
-// Use this if Cucumber BDD has compatibility issues
+// This is an alternative Mocha-based configuration
 
 exports.config = {
     runner: 'local',

@@ -1,45 +1,50 @@
 /**
- * UC-2: Test login form with credentials by passing Username
+ * UC-2: Login Form - Username Only (BDD)
  * 
- * Steps:
- * 1. Type any credentials into the Username field
- * 2. Leave the Password field empty
- * 3. Click the Login button
- * 4. Verify that the error message "Password is required" appears
+ * Feature: Login Form Validation
+ * As a user
+ * I want to see an error message when attempting to login with only username
+ * So that I understand that password is also required
+ * 
+ * Scenario Outline: Login with username only - missing password
+ * Given: User is on the SauceDemo login page
+ * When: User enters username but leaves password empty and clicks login
+ * Then: System displays "Password is required" error message
  */
 const LoginPage = require('../pages/LoginPage');
 const DataProvider = require('../utils/DataProvider');
 const logger = require('../utils/Logger');
 
-describe('UC-2: Login Form - Username Only', () => {
+describe('Feature: Login Form - Username Only', () => {
     
     const testDataArray = DataProvider.getMissingPasswordData();
     
     testDataArray.forEach((testData) => {
-        describe(`Test: ${testData.testName}`, () => {
+        describe(`Scenario: ${testData.testName}`, () => {
             
+            // GIVEN: User is on the SauceDemo login page
             beforeEach(async () => {
-                logger.info(`Starting UC-2 test: ${testData.testName}`);
+                logger.info(`GIVEN: User is on the SauceDemo login page (${testData.testName})`);
                 await LoginPage.open();
             });
             
             it('should display "Password is required" error when password is empty', async () => {
                 DataProvider.logTestData('UC-2', testData);
                 
-                // Step 1: Type any credentials into the Username field
-                logger.info(`Step 1: Entering username: ${testData.username}`);
+                // GIVEN: User has entered username in the username field
+                logger.info(`GIVEN: User has entered "${testData.username}" in the username field`);
                 await LoginPage.enterUsername(testData.username);
                 
-                // Step 2: Leave the Password field empty
-                logger.info('Step 2: Leaving password field empty');
+                // GIVEN: User has left the password field empty
+                logger.info('GIVEN: User has left the password field empty');
                 // Password field is already empty, no action needed
                 
-                // Step 3: Click the Login button
-                logger.info('Step 3: Clicking Login button');
+                // WHEN: User clicks the Login button
+                logger.info('WHEN: User clicks the Login button');
                 await LoginPage.clickLogin();
                 
-                // Step 4: Verify that the error message "Password is required" appears
-                logger.info('Step 4: Verifying error message');
+                // THEN: User should see an error message containing "Password is required"
+                logger.info('THEN: Verifying error message appears');
                 
                 // Wait for error message to appear and verify it's displayed
                 await browser.waitUntil(async () => {
