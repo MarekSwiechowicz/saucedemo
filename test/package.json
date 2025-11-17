@@ -6,8 +6,7 @@
   "scripts": {
     "test": "wdio run wdio.conf.js",
     "test:chrome": "wdio run wdio.conf.js --spec",
-    "test:firefox": "wdio run wdio.conf.js --spec",
-    "test:mocha": "wdio run wdio.conf.mocha.js"
+    "test:firefox": "wdio run wdio.conf.js --spec"
   },
   "keywords": [
     "webdriverio",

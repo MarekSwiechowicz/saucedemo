@@ -12,7 +12,7 @@ exports.config = {
       browserName: "chrome",
       "goog:chromeOptions": {
         args: [
-          // Removed --headless to run in visible mode for better stability
+          "--headless",
           "--window-size=1920,1080",
           "--no-sandbox",
           "--disable-dev-shm-usage",
@@ -40,7 +40,7 @@ exports.config = {
   // Mocha options
   mochaOpts: {
     ui: "bdd", // Use BDD interface (describe/it)
-    require: ["@babel/register"],
+    require: [require.resolve("@babel/register")],
     timeout: 90000, // Increased timeout for performance_glitch_user
   },
 
