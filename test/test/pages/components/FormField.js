@@ -15,24 +15,8 @@ class FormField extends BaseElement {
    * @param {string} value - Value to enter
    */
   async enterValue(value) {
-    try {
-      await this.waitForDisplayed();
-      await this.setValue(value);
-    } catch (e) {
-      // Handle session disconnection - retry once
-      if (
-        e.message &&
-        (e.message.includes("session") || e.message.includes("invalid"))
-      ) {
-        logger.info(`Session lost during ${this.name} entry, retrying...`);
-        await browser.pause(2000);
-        await this.waitForDisplayed();
-        await this.setValue(value);
-      } else {
-        logger.error(`Failed to enter value in ${this.name}: ${e.message}`);
-        throw e;
-      }
-    }
+    await this.waitForDisplayed();
+    await this.setValue(value);
   }
 
   /**
@@ -66,4 +50,3 @@ class FormField extends BaseElement {
 }
 
 module.exports = FormField;
-

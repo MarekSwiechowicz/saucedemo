@@ -54,7 +54,7 @@ exports.config = {
 
   mochaOpts: {
     ui: "bdd",
-    timeout: 90000, // Increased timeout for stability
+    timeout: 150000, // Increased timeout for performance_glitch_user (120s + buffer)
   },
 
   before: function (capabilities, specs) {

@@ -72,17 +72,7 @@ class LoginPage {
         }
       );
     } catch (e) {
-      // If session is lost, try to reload and retry
-      if (
-        e.message &&
-        (e.message.includes("session") || e.message.includes("invalid"))
-      ) {
-        logger.info("Session lost during navigation, reloading session...");
-        await browser.reloadSession();
-        await browser.url(this.url);
-      } else {
-        throw e;
-      }
+      throw e;
     }
   }
 
@@ -118,10 +108,9 @@ class LoginPage {
 
   /**
    * Click login button
-   * @param {boolean} useJavaScriptClick - Use JavaScript click instead of regular click (for performance_glitch_user)
    */
-  async clickLogin(useJavaScriptClick = false) {
-    await this.loginButton.click(useJavaScriptClick);
+  async clickLogin() {
+    await this.loginButton.click();
   }
 
   /**
@@ -153,57 +142,35 @@ class LoginPage {
 
   /**
    * Check if login was successful by verifying page title
+   * Note: This method checks the current state without waiting.
+   * The caller should use waitUntil to poll this method.
    * @returns {Promise<boolean>} True if "Swag Labs" title is displayed
    */
   async isLoginSuccessful() {
-    // Wait for navigation to complete
     try {
-      await browser.waitUntil(
-        async () => {
-          try {
-            const url = await browser.getUrl();
-            return url.includes("/inventory") || url.includes("inventory.html");
-          } catch (e) {
-            // If browser disconnected, return false
-            if (
-              e.message &&
-              (e.message.includes("session") ||
-                e.message.includes("disconnected"))
-            ) {
-              return false;
-            }
-            return false;
-          }
-        },
-        {
-          timeout: 20000,
-          timeoutMsg: "Failed to navigate to inventory page",
-          interval: 1000,
-        }
-      );
+      // Check URL first (faster check)
+      const url = await browser.getUrl();
+      const isOnInventoryPage =
+        url.includes("/inventory") || url.includes("inventory.html");
 
-      // Check browser title with error handling
-      try {
-        const browserTitle = await browser.getTitle();
-        return browserTitle === "Swag Labs";
-      } catch (e) {
-        // If browser disconnected, return false
-        if (
-          e.message &&
-          (e.message.includes("session") || e.message.includes("disconnected"))
-        ) {
-          return false;
-        }
-        throw e;
-      }
-    } catch (e) {
-      // Handle browser disconnection gracefully
-      if (
-        e.message &&
-        (e.message.includes("session") || e.message.includes("disconnected"))
-      ) {
+      if (!isOnInventoryPage) {
         return false;
       }
+
+      // Check browser title
+      const browserTitle = await browser.getTitle();
+      if (browserTitle === "Swag Labs") {
+        return true;
+      }
+
+      // If title is not set yet, check for inventory elements
+      // This handles cases where page loads but title takes time to update
+      const inventoryElements = await $$(
+        ".inventory_list, .inventory_container, #inventory_container"
+      );
+      return inventoryElements.length > 0;
+    } catch (e) {
+      // Any error means we're not logged in yet
       return false;
     }
   }

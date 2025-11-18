@@ -12,9 +12,8 @@ class Button extends BaseElement {
 
   /**
    * Click the button
-   * @param {boolean} useJavaScriptClick - Use JavaScript click instead of regular click
    */
-  async click(useJavaScriptClick = false) {
+  async click() {
     try {
       await this.waitForDisplayed();
       // Ensure element exists and is found
@@ -23,12 +22,7 @@ class Button extends BaseElement {
         throw new Error(`Element ${this.name} not found`);
       }
       const element = elements[0];
-      if (useJavaScriptClick) {
-        logger.info(`Using JavaScript click for ${this.name}`);
-        await browser.execute("arguments[0].click();", element);
-      } else {
-        await element.click();
-      }
+      await element.click();
     } catch (e) {
       // Retry once if click fails
       logger.info(`${this.name} click failed, retrying...`);
@@ -40,11 +34,7 @@ class Button extends BaseElement {
           throw new Error(`Element ${this.name} not found`);
         }
         const element = elements[0];
-        if (useJavaScriptClick) {
-          await browser.execute("arguments[0].click();", element);
-        } else {
-          await element.click();
-        }
+        await element.click();
       } catch (retryError) {
         logger.error(`Failed to click ${this.name}: ${retryError.message}`);
         throw retryError;
@@ -54,4 +44,3 @@ class Button extends BaseElement {
 }
 
 module.exports = Button;
-
