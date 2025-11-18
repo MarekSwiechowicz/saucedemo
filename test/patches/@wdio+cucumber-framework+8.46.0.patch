@@ -1,0 +1,55 @@
+diff --git a/node_modules/@wdio/cucumber-framework/build/index.js b/node_modules/@wdio/cucumber-framework/build/index.js
+index a033ac8..d20526e 100644
+--- a/node_modules/@wdio/cucumber-framework/build/index.js
++++ b/node_modules/@wdio/cucumber-framework/build/index.js
+@@ -61,8 +61,9 @@ class CucumberAdapter {
+         }
+         /**
+          * Including the `cucumberFormatter` here allows you to use cucumber formatting in addition to other formatting options.
++         * Note: Temporarily disabled due to ESM compatibility issues with Cucumber v7 on Windows
+          */
+-        this._cucumberOpts.format.push([this._cucumberFormatter]);
++        // this._cucumberOpts.format.push([this._cucumberFormatter]);
+         /**
+          * formatting options used by custom cucumberFormatter
+          * https://github.com/cucumber/cucumber-js/blob/3a945b1077d4539f8a363c955a0506e088ff4271/docs/formatters.md#options
+@@ -165,6 +166,15 @@ class CucumberAdapter {
+                 requirePaths: this._cucumberOpts.require,
+                 importPaths: this._cucumberOpts.import,
+             });
++            const requireFiles = await this.loadFilesWithType(this._cucumberOpts.require);
++            for (const file of requireFiles) {
++                const resolvedPath = path.isAbsolute(file) ? file : path.join(process.cwd(), file);
++                try {
++                    require(resolvedPath);
++                } catch (e) {
++                    log.warn(`Failed to pre-load ${resolvedPath}: ${e.message}`);
++                }
++            }
+             this.addWdioHooks(this._config, supportCodeLibraryBuilder);
+             await this.loadFiles();
+             this.wrapSteps(this._config);
+@@ -257,8 +267,21 @@ class CucumberAdapter {
+             if (cacheEntryToDelete) {
+                 delete require.cache[cacheEntryToDelete];
+             }
+-            const importedModule = await import(filepath);
+-            importedModules.push(importedModule);
++            try {
++                const importedModule = await import(filepath);
++                importedModules.push(importedModule);
++            } catch (e) {
++                const resolvedPath = url.fileURLToPath(filepath);
++                if (!supportCodeLibraryBuilder.cwd) {
++                    supportCodeLibraryBuilder.reset(this._cwd, this._newId, {
++                        requireModules: this._cucumberOpts.requireModule,
++                        requirePaths: this._cucumberOpts.require,
++                        importPaths: this._cucumberOpts.import,
++                    });
++                }
++                const requiredModule = require(resolvedPath);
++                importedModules.push(requiredModule);
++            }
+         }
+         return importedModules;
+     }

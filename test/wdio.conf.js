@@ -1,12 +1,12 @@
+const path = require("path");
+
 exports.config = {
   runner: "local",
 
-  // Test specs - Mocha BDD style
-  specs: ["./test/specs/**/*.test.js"],
+  specs: ["./test/features/**/*.feature"],
 
-  // Capabilities for parallel execution
-  maxInstances: 2, // Run 2 instances in parallel (one per browser)
-  maxInstancesPerCapability: 1, // Limit to 1 instance per capability to reduce resource contention
+  maxInstances: 2,
+  maxInstancesPerCapability: 1,
   capabilities: [
     {
       browserName: "chrome",
@@ -34,17 +34,18 @@ exports.config = {
     },
   ],
 
-  // Test framework - Mocha with BDD interface
-  framework: "mocha",
+  framework: "cucumber",
 
-  // Mocha options
-  mochaOpts: {
-    ui: "bdd", // Use BDD interface (describe/it)
-    require: [require.resolve("@babel/register")],
-    timeout: 90000, // Increased timeout for performance_glitch_user
+  cucumberOpts: {
+    require: ["./test/features/step-definitions/**/*.js"],
+    requireModule: ["@babel/register"],
+    timeout: 90000,
+    strict: false,
+    format: ["message"],
+    dryRun: false,
+    failFast: false,
   },
 
-  // Services
   services: [
     [
       "chromedriver",
@@ -61,15 +62,11 @@ exports.config = {
     ],
   ],
 
-  // Logging
   logLevel: "info",
 
-  // Reporters
   reporters: ["spec"],
 
-  // Hooks
   before: function (capabilities, specs) {
-    // Set implicit wait
     browser.setTimeout({
       implicit: 10000,
       pageLoad: 30000,
@@ -77,14 +74,11 @@ exports.config = {
     });
   },
 
-  // Removed beforeTest navigation - tests handle their own navigation
-
   afterTest: function (
     test,
     context,
     { error, result, duration, passed, retries }
   ) {
-    // Take screenshot on failure
     if (!passed) {
       browser.takeScreenshot();
     }
