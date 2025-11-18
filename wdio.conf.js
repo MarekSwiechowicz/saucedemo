@@ -1,7 +1,7 @@
 exports.config = {
   runner: "local",
 
-  specs: ["./test/specs/**/*.js"], // Run all test files
+  specs: ["./test/test/specs/**/*.test.js"], // Run all test files
 
   exclude: [],
 

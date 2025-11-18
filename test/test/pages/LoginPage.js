@@ -55,6 +55,22 @@ class LoginPage {
       // Navigate to login page
       logger.info("Navigating to login page");
       await browser.url(this.url);
+
+      // Wait for page to be ready - wait for username field to exist
+      await browser.waitUntil(
+        async () => {
+          try {
+            const usernameField = await $("#user-name");
+            return await usernameField.isExisting();
+          } catch (e) {
+            return false;
+          }
+        },
+        {
+          timeout: 10000,
+          timeoutMsg: "Login page did not load within 10 seconds",
+        }
+      );
     } catch (e) {
       // If session is lost, try to reload and retry
       if (

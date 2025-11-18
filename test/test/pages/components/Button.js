@@ -17,21 +17,33 @@ class Button extends BaseElement {
   async click(useJavaScriptClick = false) {
     try {
       await this.waitForDisplayed();
+      // Ensure element exists and is found
+      const elements = await $$(this.selector);
+      if (elements.length === 0) {
+        throw new Error(`Element ${this.name} not found`);
+      }
+      const element = elements[0];
       if (useJavaScriptClick) {
         logger.info(`Using JavaScript click for ${this.name}`);
-        await browser.execute("arguments[0].click();", await this.element);
+        await browser.execute("arguments[0].click();", element);
       } else {
-        await this.element.click();
+        await element.click();
       }
     } catch (e) {
       // Retry once if click fails
       logger.info(`${this.name} click failed, retrying...`);
       try {
         await this.waitForDisplayed();
+        // Ensure element exists and is found
+        const elements = await $$(this.selector);
+        if (elements.length === 0) {
+          throw new Error(`Element ${this.name} not found`);
+        }
+        const element = elements[0];
         if (useJavaScriptClick) {
-          await browser.execute("arguments[0].click();", await this.element);
+          await browser.execute("arguments[0].click();", element);
         } else {
-          await this.element.click();
+          await element.click();
         }
       } catch (retryError) {
         logger.error(`Failed to click ${this.name}: ${retryError.message}`);

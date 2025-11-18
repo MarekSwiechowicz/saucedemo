@@ -21,10 +21,12 @@ class ErrorMessage extends BaseElement {
       // Try to get text from specific text selector first
       if (this.textSelector) {
         try {
-          const textElement = $(this.textSelector);
-          const text = await textElement.getText();
-          if (text && typeof text === "string" && text.length > 0) {
-            return text;
+          const textElements = await $$(this.textSelector);
+          if (textElements.length > 0) {
+            const text = await textElements[0].getText();
+            if (text && typeof text === "string" && text.length > 0) {
+              return text;
+            }
           }
         } catch (e) {
           // Fallback to container text
@@ -32,7 +34,11 @@ class ErrorMessage extends BaseElement {
         }
       }
       // Fallback to container text
-      const containerText = await this.element.getText();
+      const containerElements = await $$(this.selector);
+      if (containerElements.length === 0) {
+        throw new Error(`Error message container ${this.name} not found`);
+      }
+      const containerText = await containerElements[0].getText();
       // Ensure we return a string
       return typeof containerText === "string"
         ? containerText
@@ -49,7 +55,12 @@ class ErrorMessage extends BaseElement {
    */
   async isDisplayed() {
     try {
-      await this.element.waitForDisplayed({
+      const elements = await $$(this.selector);
+      if (elements.length === 0) {
+        return false;
+      }
+      const element = elements[0];
+      await element.waitForDisplayed({
         timeout: 2000,
         reverse: false,
       });

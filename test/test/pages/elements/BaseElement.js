@@ -19,8 +19,56 @@ class BaseElement {
    * Wait for element to be displayed
    * @param {number} timeout - Timeout in milliseconds
    */
-  async waitForDisplayed(timeout = 5000) {
-    await this.element.waitForDisplayed({ timeout });
+  async waitForDisplayed(timeout = 10000) {
+    // Use findElements to check existence, which is more reliable with DevTools protocol
+    // In WebDriverIO v6, use waitUntil with findElements and isDisplayed for better compatibility
+    try {
+      await browser.waitUntil(
+        async () => {
+          try {
+            // Use findElements to check if element exists (more reliable than isExisting with DevTools)
+            const elements = await $$(this.selector);
+            if (elements.length === 0) {
+              return false;
+            }
+            // Get the first element and check if it's displayed
+            const element = elements[0];
+            const displayed = await element.isDisplayed();
+            return displayed;
+          } catch (e) {
+            return false;
+          }
+        },
+        {
+          timeout: timeout,
+          timeoutMsg: `Element ${this.name} was not found in DOM or not displayed within ${timeout}ms`,
+          interval: 100,
+        }
+      );
+    } catch (e) {
+      // Provide more specific error message
+      try {
+        const elements = await $$(this.selector);
+        if (elements.length === 0) {
+          throw new Error(
+            `Element ${this.name} was not found in DOM within ${timeout}ms`
+          );
+        }
+        const element = elements[0];
+        const displayed = await element.isDisplayed();
+        if (!displayed) {
+          throw new Error(
+            `Element ${this.name} was not displayed within ${timeout}ms`
+          );
+        }
+        // If we get here, something else went wrong
+        throw e;
+      } catch (checkError) {
+        throw new Error(
+          `Element ${this.name} was not found in DOM within ${timeout}ms`
+        );
+      }
+    }
   }
 
   /**
@@ -29,8 +77,12 @@ class BaseElement {
    */
   async isDisplayed() {
     try {
-      await this.element.waitForDisplayed({ timeout: 2000 });
-      return true;
+      const elements = await $$(this.selector);
+      if (elements.length === 0) {
+        return false;
+      }
+      const element = elements[0];
+      return await element.isDisplayed();
     } catch (e) {
       return false;
     }
@@ -41,7 +93,13 @@ class BaseElement {
    */
   async click() {
     await this.waitForDisplayed();
-    await this.element.click();
+    // Ensure element exists and is found before calling click
+    const elements = await $$(this.selector);
+    if (elements.length === 0) {
+      throw new Error(`Element ${this.name} not found`);
+    }
+    const element = elements[0];
+    await element.click();
   }
 
   /**
@@ -50,7 +108,12 @@ class BaseElement {
    */
   async getText() {
     await this.waitForDisplayed();
-    return await this.element.getText();
+    const elements = await $$(this.selector);
+    if (elements.length === 0) {
+      throw new Error(`Element ${this.name} not found`);
+    }
+    const element = elements[0];
+    return await element.getText();
   }
 
   /**
@@ -59,7 +122,14 @@ class BaseElement {
    */
   async setValue(value) {
     await this.waitForDisplayed();
-    await this.element.setValue(value);
+    // Ensure element exists and is found before calling setValue
+    // Use findElements approach for better compatibility with DevTools protocol
+    const elements = await $$(this.selector);
+    if (elements.length === 0) {
+      throw new Error(`Element ${this.name} not found`);
+    }
+    const element = elements[0];
+    await element.setValue(value);
   }
 
   /**
@@ -67,9 +137,13 @@ class BaseElement {
    */
   async clear() {
     await this.waitForDisplayed();
-    await this.element.clear();
+    const elements = await $$(this.selector);
+    if (elements.length === 0) {
+      throw new Error(`Element ${this.name} not found`);
+    }
+    const element = elements[0];
+    await element.clear();
   }
 }
 
 module.exports = BaseElement;
-
