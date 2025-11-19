@@ -1,12 +1,12 @@
 {
-  "name": "saucedemo-automation",
+  "name": "saucedemo-test-automation",
   "version": "1.0.0",
-  "description": "WebDriverIO test automation for SauceDemo login page",
+  "description": "SauceDemo Test Automation with WebDriverIO",
   "main": "index.js",
   "scripts": {
     "test": "wdio run wdio.conf.js",
-    "test:all-in-one": "wdio run wdio.conf.js --spec test/specs/login.all-in-one.test.js",
-    "test:firefox": "wdio run wdio.firefox-only.conf.js"
+    "test:chrome": "wdio run wdio.conf.js --spec",
+    "test:firefox": "wdio run wdio.conf.js --spec"
   },
   "keywords": [
     "webdriverio",
@@ -16,18 +16,26 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@wdio/cli": "^6.12.1",
-    "@wdio/local-runner": "^6.12.1",
-    "@wdio/mocha-framework": "^6.11.0",
-    "@wdio/spec-reporter": "^6.11.0",
-    "chromedriver": "^142.0.1",
-    "geckodriver": "^3.0.1",
-    "wdio-chromedriver-service": "^6.0.4",
-    "wdio-geckodriver-service": "^2.0.3"
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/register": "^7.28.3",
+    "@wdio/cli": "^8.24.0",
+    "@wdio/local-runner": "^8.24.0",
+    "@wdio/mocha-framework": "^8.24.0",
+    "@wdio/spec-reporter": "^8.24.0",
+    "chromedriver": "^142.0.2",
+    "geckodriver": "^4.2.0",
+    "patch-package": "^8.0.1",
+    "ts-node": "^10.9.2",
+    "wdio-chromedriver-service": "^8.1.1",
+    "wdio-geckodriver-service": "^5.0.2",
+    "webdriverio": "^8.24.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
-    "fs-extra": "^9.1.0",
-    "webdriverio": "^6.12.1",
-    "winston": "^3.18.3"
+    "winston": "^3.11.0"
   }
 }
+

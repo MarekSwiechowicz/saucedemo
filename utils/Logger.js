@@ -7,7 +7,7 @@ const path = require('path');
 
 // Create logs directory if it doesn't exist
 const fs = require('fs');
-const logsDir = path.join(__dirname, '../../logs');
+const logsDir = path.join(__dirname, '../logs');
 if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
 }
@@ -48,4 +48,5 @@ const logger = winston.createLogger({
 });
 
 module.exports = logger;
+
 
