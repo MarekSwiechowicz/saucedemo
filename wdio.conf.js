@@ -41,7 +41,7 @@ exports.config = {
   mochaOpts: {
     ui: "bdd", // Use BDD interface (describe/it)
     require: [require.resolve("@babel/register")],
-    timeout: 90000, // Increased timeout for performance_glitch_user
+    timeout: 180000, // Increased timeout for performance_glitch_user (3 minutes)
   },
 
   // Services

@@ -3,7 +3,7 @@
  * Handles input field operations with enhanced clearing
  */
 const BaseElement = require("../elements/BaseElement");
-const logger = require("../utils/Logger");
+const logger = require("../../utils/Logger");
 
 class FormField extends BaseElement {
   constructor(selector, name) {

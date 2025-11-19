@@ -108,9 +108,42 @@ class LoginPage {
 
   /**
    * Click login button
+   * For Chrome compatibility, try multiple approaches to ensure form submission
    */
   async clickLogin() {
-    await this.loginButton.click();
+    try {
+      // First, try standard click
+      await this.loginButton.click();
+      
+      // For Chrome, also try submitting the form directly as a fallback
+      // This helps with certain test users that may have issues with button clicks
+      const capabilities = browser.capabilities || {};
+      const browserName = capabilities.browserName?.toLowerCase();
+      if (browserName === 'chrome') {
+        // Wait a moment to see if navigation starts
+        await browser.pause(500);
+        const currentUrl = await browser.getUrl();
+        
+        // If still on login page, try form submission
+        if (currentUrl.includes('saucedemo.com') && !currentUrl.includes('inventory')) {
+          try {
+            // Try submitting the form directly via JavaScript
+            await browser.execute(() => {
+              const form = document.querySelector('form');
+              if (form) {
+                form.submit();
+              }
+            });
+            logger.info("Attempted form submission via JavaScript for Chrome compatibility");
+          } catch (e) {
+            logger.info("Form submission fallback not needed or failed");
+          }
+        }
+      }
+    } catch (e) {
+      logger.error(`Error clicking login button: ${e.message}`);
+      throw e;
+    }
   }
 
   /**

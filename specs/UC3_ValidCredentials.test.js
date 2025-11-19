@@ -59,15 +59,30 @@ describe("Feature: Login Form - Valid Credentials", () => {
         logger.info("WHEN: User clicks the Login button");
         await LoginPage.clickLogin();
 
+        // Wait a moment for navigation to start (especially important for Chrome)
+        await browser.pause(1000);
+
+        // Check for error messages first (in case login failed)
+        // Only fail if there's an actual error message with text (not just an empty container)
+        const hasError = await LoginPage.isErrorMessageDisplayed();
+        if (hasError) {
+          const errorMsg = await LoginPage.getErrorMessage();
+          // Only throw error if there's actual error text (not just whitespace)
+          if (errorMsg && errorMsg.trim().length > 0) {
+            logger.error(`Login failed with error: ${errorMsg}`);
+            throw new Error(`Login failed: ${errorMsg}`);
+          }
+        }
+
         // THEN: User should be successfully logged in
         logger.info("THEN: Verifying successful login");
 
         // Wait for successful login and verify
         // performance_glitch_user has intentional delays, so we need a very long timeout
         const timeout =
-          testData.username === "performance_glitch_user" ? 120000 : 10000;
+          testData.username === "performance_glitch_user" ? 150000 : 10000;
         const interval =
-          testData.username === "performance_glitch_user" ? 5000 : 500;
+          testData.username === "performance_glitch_user" ? 2000 : 500;
 
         await browser.waitUntil(
           async () => {
