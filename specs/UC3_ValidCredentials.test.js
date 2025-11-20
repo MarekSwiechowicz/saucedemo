@@ -55,6 +55,9 @@ describe("Feature: Login Form - Valid Credentials", () => {
         );
         await LoginPage.enterPassword(testData.password);
 
+        // Small pause to ensure values are persisted in DOM
+        await browser.pause(300);
+
         // WHEN: User clicks the Login button
         logger.info("WHEN: User clicks the Login button");
         await LoginPage.clickLogin();
