@@ -1,67 +1,86 @@
+const path = require("path");
+
 exports.config = {
   runner: "local",
 
-  specs: ["./test/specs/**/*.js"], // Run all test files
-
-  exclude: [],
+  specs: ["./features/**/*.feature"],
 
   maxInstances: 2,
-
+  maxInstancesPerCapability: 1,
   capabilities: [
     {
-      maxInstances: 1,
       browserName: "chrome",
-      // Use devtools protocol (Puppeteer) instead of WebDriver protocol
-      // This works with Chrome 142 without requiring ChromeDriver 142 (which needs Node 20+)
       "goog:chromeOptions": {
         args: [
           "--headless",
-          "--disable-gpu",
           "--window-size=1920,1080",
           "--no-sandbox",
           "--disable-dev-shm-usage",
           "--disable-software-rasterizer",
+          "--disable-extensions",
+          "--disable-background-timer-throttling",
+          "--disable-backgrounding-occluded-windows",
+          "--disable-renderer-backgrounding",
+          "--disable-features=TranslateUI",
+          "--disable-ipc-flooding-protection",
         ],
       },
     },
     {
-      maxInstances: 1,
       browserName: "firefox",
-      protocol: "webdriver",
       "moz:firefoxOptions": {
         args: ["--headless"],
       },
     },
   ],
 
+  framework: "cucumber",
+
+  cucumberOpts: {
+    require: ["./features/step-definitions/**/*.js"],
+    requireModule: ["@babel/register"],
+    timeout: 90000,
+    strict: false,
+    format: ["message"],
+    dryRun: false,
+    failFast: false,
+  },
+
+  services: [
+    [
+      "chromedriver",
+      {
+        logPath: "./logs",
+        args: ["--silent"],
+      },
+    ],
+    [
+      "geckodriver",
+      {
+        logPath: "./logs",
+      },
+    ],
+  ],
+
   logLevel: "info",
-
-  bail: 0,
-
-  baseUrl: "https://www.saucedemo.com",
-
-  waitforTimeout: 10000,
-
-  connectionRetryTimeout: 120000,
-
-  connectionRetryCount: 3,
-
-  services: ["geckodriver"], // Chrome uses devtools protocol, doesn't need chromedriver service
-
-  framework: "mocha",
 
   reporters: ["spec"],
 
-  mochaOpts: {
-    ui: "bdd",
-    timeout: 90000, // Increased timeout for stability
-  },
-
   before: function (capabilities, specs) {
-    console.log("Starting test execution...");
+    browser.setTimeout({
+      implicit: 10000,
+      pageLoad: 30000,
+      script: 30000,
+    });
   },
 
-  after: function (result, capabilities, specs) {
-    console.log("Test execution completed.");
+  afterTest: function (
+    test,
+    context,
+    { error, result, duration, passed, retries }
+  ) {
+    if (!passed) {
+      browser.takeScreenshot();
+    }
   },
 };
