@@ -1,0 +1,39 @@
+diff --git a/node_modules/@wdio/cucumber-framework/build/index.js b/node_modules/@wdio/cucumber-framework/build/index.js
+index a033ac8..964c5a4 100644
+--- a/node_modules/@wdio/cucumber-framework/build/index.js
++++ b/node_modules/@wdio/cucumber-framework/build/index.js
+@@ -61,8 +61,9 @@ class CucumberAdapter {
+         }
+         /**
+          * Including the `cucumberFormatter` here allows you to use cucumber formatting in addition to other formatting options.
++         * Note: Temporarily disabled due to ESM compatibility issues with Cucumber v7 on Windows
+          */
+-        this._cucumberOpts.format.push([this._cucumberFormatter]);
++        // this._cucumberOpts.format.push([this._cucumberFormatter]);
+         /**
+          * formatting options used by custom cucumberFormatter
+          * https://github.com/cucumber/cucumber-js/blob/3a945b1077d4539f8a363c955a0506e088ff4271/docs/formatters.md#options
+@@ -257,8 +258,21 @@ class CucumberAdapter {
+             if (cacheEntryToDelete) {
+                 delete require.cache[cacheEntryToDelete];
+             }
+-            const importedModule = await import(filepath);
+-            importedModules.push(importedModule);
++            try {
++                const importedModule = await import(filepath);
++                importedModules.push(importedModule);
++            } catch (e) {
++                const resolvedPath = url.fileURLToPath(filepath);
++                if (!supportCodeLibraryBuilder.cwd) {
++                    supportCodeLibraryBuilder.reset(this._cwd, this._newId, {
++                        requireModules: this._cucumberOpts.requireModule,
++                        requirePaths: this._cucumberOpts.require,
++                        importPaths: this._cucumberOpts.import,
++                    });
++                }
++                const requiredModule = require(resolvedPath);
++                importedModules.push(requiredModule);
++            }
+         }
+         return importedModules;
+     }

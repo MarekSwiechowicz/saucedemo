@@ -1,0 +1,10 @@
+node_modules/
+logs/
+reports/
+*.log
+.DS_Store
+*.png
+*.jpg
+selenium-debug.log
+
+node_modules
