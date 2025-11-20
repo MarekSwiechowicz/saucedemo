@@ -5,11 +5,11 @@ exports.config = {
 
   specs: ["./features/**/*.feature"],
 
-  maxInstances: 2,
+  maxInstances: 1,
   maxInstancesPerCapability: 1,
   capabilities: [
     {
-      browserName: "chrome",
+      browserName: process.env.BROWSER || "chrome",
       "goog:chromeOptions": {
         args: [
           "--headless",
@@ -25,9 +25,6 @@ exports.config = {
           "--disable-ipc-flooding-protection",
         ],
       },
-    },
-    {
-      browserName: "firefox",
       "moz:firefoxOptions": {
         args: ["--headless"],
       },
@@ -38,7 +35,7 @@ exports.config = {
 
   cucumberOpts: {
     require: ["./features/step-definitions/**/*.js"],
-    requireModule: ["@babel/register"],
+    requireModule: [],
     timeout: 90000,
     strict: false,
     format: ["message"],
