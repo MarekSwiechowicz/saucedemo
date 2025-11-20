@@ -6,7 +6,7 @@
   "scripts": {
     "test": "wdio run wdio.conf.js",
     "test:chrome": "wdio run wdio.chrome.conf.js",
-    "test:firefox": "wdio run wdio.conf.js --spec",
+    "test:firefox": "wdio run wdio.firefox.conf.js",
     "test:single": "wdio run wdio.chrome.conf.js --spec"
   },
   "keywords": [

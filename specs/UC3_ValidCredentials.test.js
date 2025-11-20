@@ -2,17 +2,9 @@
  * UC-3: Login Form - Valid Credentials (BDD)
  *
  * Feature: Login Form - Successful Login
- * As a user
- * I want to login successfully with valid credentials
- * So that I can access the application
- *
  * Scenario Outline: Successful login with valid credentials
- * Given: User is on the SauceDemo login page
- * When: User enters valid username and password and clicks login
- * Then: User is successfully logged in
- * And: User should see the page title "Swag Labs"
- * And: User should be on the inventory page
  */
+
 const LoginPage = require("../pages/LoginPage");
 const DataProvider = require("../utils/DataProvider");
 const logger = require("../utils/Logger");
@@ -22,20 +14,16 @@ describe("Feature: Login Form - Valid Credentials", () => {
 
   testDataArray.forEach((testData) => {
     describe(`Scenario: ${testData.testName}`, () => {
-      // GIVEN: User is on the SauceDemo login page
+      
       beforeEach(async () => {
-        logger.info(
-          `GIVEN: User is on the SauceDemo login page (${testData.testName})`
-        );
+        logger.info(`GIVEN: User is on the SauceDemo login page (${testData.testName})`);
 
-        // For performance_glitch_user, set longer timeouts
-        if (testData.username === "performance_glitch_user") {
-          await browser.setTimeout({
-            implicit: 30000,
-            pageLoad: 90000,
-            script: 90000,
-          });
-        }
+        // Reset timeouts for all scenarios
+        await browser.setTimeout({
+          implicit: 0,
+          pageLoad: 20000,
+          script: 20000,
+        });
 
         await LoginPage.open();
       });
@@ -43,83 +31,47 @@ describe("Feature: Login Form - Valid Credentials", () => {
       it('should successfully login and display "Swag Labs" title', async () => {
         DataProvider.logTestData("UC-3", testData);
 
-        // GIVEN: User has entered username in the username field
-        logger.info(
-          `GIVEN: User has entered "${testData.username}" in the username field`
-        );
+        logger.info(`GIVEN: Username is set to "${testData.username}"`);
         await LoginPage.enterUsername(testData.username);
 
-        // GIVEN: User has entered a valid password in the password field
-        logger.info(
-          "GIVEN: User has entered a valid password in the password field"
-        );
+        logger.info("GIVEN: Password is set");
         await LoginPage.enterPassword(testData.password);
 
-        // Small pause to ensure values are persisted in DOM
-        await browser.pause(300);
-
-        // WHEN: User clicks the Login button
-        logger.info("WHEN: User clicks the Login button");
+        logger.info("WHEN: Login button is clicked");
         await LoginPage.clickLogin();
 
-        // Wait a moment for navigation to start (especially important for Chrome)
-        await browser.pause(1000);
+        // Special delay logic only for performance_glitch_user
+        const waitTimeout = testData.username === "performance_glitch_user" ? 30000 : 7000;
 
-        // Check for error messages first (in case login failed)
-        // Only fail if there's an actual error message with text (not just an empty container)
-        const hasError = await LoginPage.isErrorMessageDisplayed();
-        if (hasError) {
-          const errorMsg = await LoginPage.getErrorMessage();
-          // Only throw error if there's actual error text (not just whitespace)
-          if (errorMsg && errorMsg.trim().length > 0) {
-            logger.error(`Login failed with error: ${errorMsg}`);
-            throw new Error(`Login failed: ${errorMsg}`);
-          }
-        }
-
-        // THEN: User should be successfully logged in
-        logger.info("THEN: Verifying successful login");
-
-        // Wait for successful login and verify
-        // performance_glitch_user has intentional delays, so we need a very long timeout
-        const timeout =
-          testData.username === "performance_glitch_user" ? 150000 : 10000;
-        const interval =
-          testData.username === "performance_glitch_user" ? 2000 : 500;
+        logger.info("THEN: Waiting for login to complete");
 
         await browser.waitUntil(
           async () => {
             return await LoginPage.isLoginSuccessful();
           },
           {
-            timeout: timeout,
-            interval: interval,
-            timeoutMsg:
-              'Login was not successful - page title "Swag Labs" did not appear',
+            timeout: waitTimeout,
+            interval: 250,
+            timeoutMsg: 'Login failed — "Swag Labs" title not found in time',
           }
         );
 
         expect(await LoginPage.isLoginSuccessful()).toBe(true);
 
-        // AND: User should see the page title "Swag Labs"
-        logger.info('AND: Verifying page title "Swag Labs" is displayed');
-        const pageTitle = await LoginPage.getPageTitle();
-        logger.info(`Page title displayed: ${pageTitle}`);
+        logger.info('AND: Checking that page title equals "Swag Labs"');
+        const title = await LoginPage.getPageTitle();
+        expect(title).toBe("Swag Labs");
 
-        // Assert page title matches exactly
-        expect(pageTitle).toBe("Swag Labs");
+        logger.info("AND: Checking that user is on inventory page");
+        const url = await browser.getUrl();
+        expect(url).toContain("/inventory.html");
 
-        // AND: User should be on the inventory page
-        logger.info("AND: Verifying user is on the inventory page");
-        const currentUrl = await browser.getUrl();
-        expect(currentUrl).toContain("/inventory.html");
-        logger.info(`Successfully navigated to: ${currentUrl}`);
+        logger.info(`Successfully navigated to inventory: ${url}`);
       });
 
       afterEach(() => {
-        logger.info(`UC-3 test completed: ${testData.testName}`);
+        logger.info(`UC-3 completed: ${testData.testName}`);
       });
     });
   });
 });
-
