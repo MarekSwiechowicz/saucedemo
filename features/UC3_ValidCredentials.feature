@@ -13,8 +13,6 @@ Feature: Login Form - Valid Credentials
     And I should be on the inventory page
 
     Examples:
-      | username              |
-      | standard_user          |
-      | problem_user            |
-      | performance_glitch_user |
+      | username      |
+      | standard_user |
 

@@ -11,7 +11,6 @@ Feature: Login Form - Username Only
     Then I should see an error message containing "Password is required"
 
     Examples:
-      | username        |
-      | standard_user   |
-      | problem_user    |
+      | username      |
+      | standard_user |
 

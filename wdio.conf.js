@@ -5,31 +5,58 @@ exports.config = {
 
   specs: ["./features/**/*.feature"],
 
-  maxInstances: 1,
+  maxInstances: process.env.BROWSER ? 1 : 2,
   maxInstancesPerCapability: 1,
-  capabilities: [
-    {
-      browserName: process.env.BROWSER || "chrome",
-      "goog:chromeOptions": {
-        args: [
-          "--headless",
-          "--window-size=1920,1080",
-          "--no-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-software-rasterizer",
-          "--disable-extensions",
-          "--disable-background-timer-throttling",
-          "--disable-backgrounding-occluded-windows",
-          "--disable-renderer-backgrounding",
-          "--disable-features=TranslateUI",
-          "--disable-ipc-flooding-protection",
-        ],
-      },
-      "moz:firefoxOptions": {
-        args: ["--headless"],
-      },
-    },
-  ],
+  capabilities: process.env.BROWSER
+    ? [
+        {
+          browserName: process.env.BROWSER,
+          "goog:chromeOptions": {
+            args: [
+              "--headless",
+              "--window-size=1920,1080",
+              "--no-sandbox",
+              "--disable-dev-shm-usage",
+              "--disable-software-rasterizer",
+              "--disable-extensions",
+              "--disable-background-timer-throttling",
+              "--disable-backgrounding-occluded-windows",
+              "--disable-renderer-backgrounding",
+              "--disable-features=TranslateUI",
+              "--disable-ipc-flooding-protection",
+            ],
+          },
+          "moz:firefoxOptions": {
+            args: ["--headless"],
+          },
+        },
+      ]
+    : [
+        {
+          browserName: "chrome",
+          "goog:chromeOptions": {
+            args: [
+              "--headless",
+              "--window-size=1920,1080",
+              "--no-sandbox",
+              "--disable-dev-shm-usage",
+              "--disable-software-rasterizer",
+              "--disable-extensions",
+              "--disable-background-timer-throttling",
+              "--disable-backgrounding-occluded-windows",
+              "--disable-renderer-backgrounding",
+              "--disable-features=TranslateUI",
+              "--disable-ipc-flooding-protection",
+            ],
+          },
+        },
+        {
+          browserName: "firefox",
+          "moz:firefoxOptions": {
+            args: ["--headless"],
+          },
+        },
+      ],
 
   framework: "cucumber",
 

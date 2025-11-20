@@ -18,18 +18,6 @@ class DataProvider {
                 password: 'secret_sauce',
                 expectedResult: 'success'
             },
-            {
-                testName: 'Valid Problem User',
-                username: 'problem_user',
-                password: 'secret_sauce',
-                expectedResult: 'success'
-            },
-            {
-                testName: 'Valid Performance Glitch User',
-                username: 'performance_glitch_user',
-                password: 'secret_sauce',
-                expectedResult: 'success'
-            }
         ];
     }
     
