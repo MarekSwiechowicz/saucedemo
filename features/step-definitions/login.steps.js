@@ -4,8 +4,18 @@ const logger = require("../../utils/Logger");
 const { expect } = require("@wdio/globals");
 
 Given("I am on the SauceDemo login page", async function () {
-  logger.info("GIVEN: User is on the SauceDemo login page");
-  await LoginPage.open();
+  console.log("STEP DEFINITION EXECUTED: I am on the SauceDemo login page");
+  try {
+    logger.info("GIVEN: User is on the SauceDemo login page");
+    console.log("About to call LoginPage.open()");
+    await LoginPage.open();
+    console.log("LoginPage.open() completed successfully");
+  } catch (error) {
+    console.error("ERROR in Given step:", error);
+    logger.error(`Error in Given step: ${error.message}`);
+    logger.error(error.stack);
+    throw error;
+  }
 });
 
 When(

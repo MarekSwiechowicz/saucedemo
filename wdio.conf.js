@@ -62,9 +62,16 @@ exports.config = {
     ],
   ],
 
-  logLevel: "info",
+  logLevel: "debug",
 
-  reporters: ["spec"],
+  reporters: [
+    [
+      "spec",
+      {
+        showPreface: false,
+      },
+    ],
+  ],
 
   before: function (capabilities, specs) {
     browser.setTimeout({
@@ -80,6 +87,7 @@ exports.config = {
     { error, result, duration, passed, retries }
   ) {
     if (!passed) {
+      console.error("Test failed with error:", error);
       browser.takeScreenshot();
     }
   },

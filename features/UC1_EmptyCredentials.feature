@@ -9,4 +9,3 @@ Feature: Login Form - Empty Credentials
     And I clear both username and password fields
     And I click the Login button
     Then I should see an error message containing "Username is required"
-
