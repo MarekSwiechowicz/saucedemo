@@ -1,7 +1,3 @@
-/**
- * Button Component
- * Handles button click operations with retry logic
- */
 const BaseElement = require("../elements/BaseElement");
 const logger = require("../../utils/Logger");
 
@@ -10,10 +6,6 @@ class Button extends BaseElement {
     super(selector, name);
   }
 
-  /**
-   * Click the button
-   * @param {boolean} useJavaScriptClick - Use JavaScript click instead of regular click
-   */
   async click(useJavaScriptClick = false) {
     try {
       await this.waitForDisplayed();
@@ -24,7 +16,6 @@ class Button extends BaseElement {
         await this.element.click();
       }
     } catch (e) {
-      // Retry once if click fails
       logger.info(`${this.name} click failed, retrying...`);
       try {
         await this.waitForDisplayed();
@@ -42,4 +33,3 @@ class Button extends BaseElement {
 }
 
 module.exports = Button;
-
