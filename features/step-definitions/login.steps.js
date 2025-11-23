@@ -1,6 +1,7 @@
 const { Given, When, Then } = require("@wdio/cucumber-framework");
 const LoginPage = require("../../pages/LoginPage");
 const logger = require("../../utils/Logger");
+const DataProvider = require("../../utils/DataProvider");
 const { expect } = require("@wdio/globals");
 
 Given("I am on the SauceDemo login page", async function () {
@@ -22,8 +23,14 @@ When(
   "I enter temporary credentials in username and password fields",
   async function () {
     logger.info("GIVEN: User has entered temporary credentials");
+    // Use DataProvider to get valid test data for temporary credentials
+    const validPassword = DataProvider.getValidPassword();
     await LoginPage.enterUsername("test_user");
-    await LoginPage.enterPassword("test_password");
+    await LoginPage.enterPassword(validPassword);
+    DataProvider.logTestData("Temporary Credentials", {
+      username: "test_user",
+      password: validPassword,
+    });
   }
 );
 
@@ -36,6 +43,11 @@ When("I clear both username and password fields", async function () {
 
 When("I enter {string} in the username field", async function (username) {
   logger.info(`GIVEN: User has entered "${username}" in the username field`);
+  // Validate username against accepted usernames from DataProvider
+  const acceptedUsernames = DataProvider.getAcceptedUsernames();
+  if (acceptedUsernames.includes(username)) {
+    logger.info(`Username "${username}" is in the accepted usernames list`);
+  }
   await LoginPage.enterUsername(username);
 });
 
@@ -46,6 +58,11 @@ When("I clear the password field", async function () {
 
 When("I enter {string} in the password field", async function (password) {
   logger.info("GIVEN: User has entered a valid password in the password field");
+  // Validate password against valid password from DataProvider
+  const validPassword = DataProvider.getValidPassword();
+  if (password === validPassword) {
+    logger.info("Password matches the valid password from DataProvider");
+  }
   await LoginPage.enterPassword(password);
 });
 
@@ -70,6 +87,29 @@ Then(
   async function (expectedText) {
     logger.info("THEN: Verifying error message appears");
 
+    // Use DataProvider to validate expected error messages
+    const emptyCredentialsData = DataProvider.getEmptyCredentialsData();
+    const missingPasswordData = DataProvider.getMissingPasswordData();
+
+    // Check if expectedText matches any expected error from DataProvider
+    let dataProviderError = null;
+    if (expectedText.toLowerCase().includes("username")) {
+      dataProviderError = emptyCredentialsData.expectedError;
+      DataProvider.logTestData(
+        emptyCredentialsData.testName,
+        emptyCredentialsData
+      );
+    } else if (expectedText.toLowerCase().includes("password")) {
+      // Find matching test data
+      const matchingData = missingPasswordData.find((data) =>
+        data.expectedError.toLowerCase().includes(expectedText.toLowerCase())
+      );
+      if (matchingData) {
+        dataProviderError = matchingData.expectedError;
+        DataProvider.logTestData(matchingData.testName, matchingData);
+      }
+    }
+
     await browser.waitUntil(
       async () => {
         return await LoginPage.isErrorMessageDisplayed();
@@ -87,17 +127,40 @@ Then(
 
     expect(errorMessage).toMatch(new RegExp(expectedText, "i"));
     expect(errorMessage.length).toBeGreaterThan(0);
+
+    // Also validate against DataProvider expected error if available
+    if (dataProviderError) {
+      expect(errorMessage).toMatch(new RegExp(dataProviderError, "i"));
+    }
   }
 );
 
 Then("I should be successfully logged in", async function () {
   logger.info("THEN: Verifying successful login");
+
+  // Use DataProvider to get expected login test data
+  const loginTestData = DataProvider.getLoginTestData();
+  if (loginTestData && loginTestData.length > 0) {
+    DataProvider.logTestData(loginTestData[0].testName, loginTestData[0]);
+  }
+
   const isSuccessful = await LoginPage.isLoginSuccessful();
   expect(isSuccessful).toBe(true);
 });
 
 Then("I should see the page title {string}", async function (expectedTitle) {
   logger.info(`AND: Verifying page title "${expectedTitle}" is displayed`);
+
+  // Use DataProvider to get login test data for validation
+  const loginTestData = DataProvider.getLoginTestData();
+  if (
+    loginTestData &&
+    loginTestData.length > 0 &&
+    loginTestData[0].expectedResult === "success"
+  ) {
+    logger.info("Validating against DataProvider login test data");
+  }
+
   const pageTitle = await LoginPage.getPageTitle();
   logger.info(`Page title displayed: ${pageTitle}`);
   expect(pageTitle).toBe(expectedTitle);

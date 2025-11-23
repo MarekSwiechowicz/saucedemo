@@ -13,4 +13,5 @@ Feature: Login Form - Username Only
     Examples:
       | username      |
       | standard_user |
+      | problem_user  |
 

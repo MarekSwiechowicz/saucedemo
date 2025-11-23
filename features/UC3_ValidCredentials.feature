@@ -15,4 +15,5 @@ Feature: Login Form - Valid Credentials
     Examples:
       | username      |
       | standard_user |
+      | problem_user  |
 
