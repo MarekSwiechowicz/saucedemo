@@ -9,7 +9,7 @@ class FormField extends BaseElement {
   async enterValue(value) {
     try {
       await this.waitForDisplayed();
-      await this.setValue(value);
+      await this.setValue(value, true);
     } catch (e) {
       if (
         e.message &&
@@ -18,7 +18,7 @@ class FormField extends BaseElement {
         logger.info(`Session lost during ${this.name} entry, retrying...`);
         await browser.pause(2000);
         await this.waitForDisplayed();
-        await this.setValue(value);
+        await this.setValue(value, true);
       } else {
         logger.error(`Failed to enter value in ${this.name}: ${e.message}`);
         throw e;

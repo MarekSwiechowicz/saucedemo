@@ -8,7 +8,7 @@ class Button extends BaseElement {
 
   async click(useJavaScriptClick = false) {
     try {
-      await this.waitForDisplayed();
+      await this.waitForClickable();
       if (useJavaScriptClick) {
         logger.info(`Using JavaScript click for ${this.name}`);
         await browser.execute("arguments[0].click();", await this.element);
@@ -18,7 +18,7 @@ class Button extends BaseElement {
     } catch (e) {
       logger.info(`${this.name} click failed, retrying...`);
       try {
-        await this.waitForDisplayed();
+        await this.waitForClickable();
         if (useJavaScriptClick) {
           await browser.execute("arguments[0].click();", await this.element);
         } else {
