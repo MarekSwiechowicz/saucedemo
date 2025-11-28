@@ -5,8 +5,6 @@
   "main": "index.js",
   "scripts": {
     "test": "wdio run wdio.conf.js",
-    "test:all": "wdio run wdio.conf.js",
-    "test:both": "wdio run wdio.conf.js",
     "test:chrome": "cross-env BROWSER=chrome wdio run wdio.conf.js",
     "test:firefox": "cross-env BROWSER=firefox wdio run wdio.conf.js",
     "test:uc1": "cross-env BROWSER=chrome wdio run wdio.conf.js --spec ./features/UC1_EmptyCredentials.feature",
