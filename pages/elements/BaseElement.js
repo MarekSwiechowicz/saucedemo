@@ -1,3 +1,5 @@
+const { $ } = require("@wdio/globals");
+
 class BaseElement {
   constructor(selector, name) {
     this.selector = selector;

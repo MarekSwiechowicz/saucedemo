@@ -3,6 +3,7 @@ const FormField = require("./components/FormField");
 const Button = require("./components/Button");
 const ErrorMessage = require("./components/ErrorMessage");
 const BaseElement = require("./elements/BaseElement");
+const { browser } = require("@wdio/globals");
 
 class LoginPage {
   get url() {
@@ -136,4 +137,4 @@ class LoginPage {
   }
 }
 
-module.exports = new LoginPage();
+module.exports = LoginPage;

@@ -1,5 +1,6 @@
 const BaseElement = require("../elements/BaseElement");
 const logger = require("../../utils/Logger");
+const { browser } = require("@wdio/globals");
 
 class Button extends BaseElement {
   constructor(selector, name) {

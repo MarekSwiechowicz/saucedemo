@@ -1,18 +1,17 @@
 const { Given, When, Then } = require("@wdio/cucumber-framework");
-const LoginPage = require("../../pages/LoginPage");
+const LoginPageClass = require("../../pages/LoginPage");
 const logger = require("../../utils/Logger");
 const DataProvider = require("../../utils/DataProvider");
-const { expect } = require("@wdio/globals");
+const { expect, browser } = require("@wdio/globals");
+
+// Create a LoginPage instance for this test context
+const LoginPage = new LoginPageClass();
 
 Given("I am on the SauceDemo login page", async function () {
-  console.log("STEP DEFINITION EXECUTED: I am on the SauceDemo login page");
   try {
     logger.info("GIVEN: User is on the SauceDemo login page");
-    console.log("About to call LoginPage.open()");
     await LoginPage.open();
-    console.log("LoginPage.open() completed successfully");
   } catch (error) {
-    console.error("ERROR in Given step:", error);
     logger.error(`Error in Given step: ${error.message}`);
     logger.error(error.stack);
     throw error;
